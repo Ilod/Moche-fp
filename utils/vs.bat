@@ -143,8 +143,6 @@ if "%~4"=="" (
     set buildConfig=%4
 )
 call :setupEnv
-@echo on
 msbuild "..\%~1" %buildToolsetArgument% /p:Configuration=%buildConfig% /p:Platform=%buildPlatform%
-]echo off
 endlocal
 goto :eof

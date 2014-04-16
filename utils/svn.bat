@@ -5,7 +5,7 @@ set SVN=..\extern_bin\svn\bin\svn.exe
 set SVN_REPOS=..\extern_repo\
 if %~1==get call :get %2 %3
 if %~1==checkout call :checkout %2 %3
-if %~1==update call :checkout %2
+if %~1==update call :update %2
 if %~1==check call :check %2
 ENDLOCAL
 goto :eof
