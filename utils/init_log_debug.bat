@@ -1,0 +1,7 @@
+set TRACE=
+set INTERNAL_CALL=echo.
+set PRE_EXTERNAL_CALL=echo.
+set EXTERNAL_CALL=pause
+set FILE_START=REM
+set FUNCTION_START=echo.
+set FUNCTION_END=REM
