@@ -1,3 +1,15 @@
 [submodule "submodules/cmake"]
 	path = submodules/cmake
 	url = http://cmake.org/cmake.git
+[submodule "submodules/llvm"]
+	path = submodules/llvm
+	url = http://llvm.org/git/llvm
+[submodule "submodules/clang"]
+	path = submodules/clang
+	url = http://llvm.org/git/clang
+[submodule "submodules/compiler-rt"]
+	path = submodules/compiler-rt
+	url = http://llvm.org/git/compiler-rt
+[submodule "submodules/clang-tools-extra"]
+	path = submodules/clang-tools-extra
+	url = http://llvm.org/git/clang-tools-extra
