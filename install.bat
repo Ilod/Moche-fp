@@ -11,6 +11,11 @@ call get_extern.bat
 REM To fix
 REM call :checkClang
 call build_extern.bat
+if errorlevel 1 (
+    echo. Fatal error building extern tools
+    pause
+    exit /B %errorlevel%
+)
 popd
 echo. Build finished
 pause

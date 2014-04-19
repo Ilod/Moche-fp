@@ -2,6 +2,6 @@
 call cmake.bat install llvm "" "" "" "LLVM/CLang"
 if errorlevel 1 (
     echo. Error building LLVM/Clang
-    pause
     exit /B %errorlevel%
 )
+exit /B 0
