@@ -65,7 +65,7 @@ goto :eof
 %INTERNAL_CALL% :generate %1 %3 %4 %5
 call :generate %1 %3 %4 %5
 %INTERNAL_CALL% :buildOnly %1 %2 %3 %4 %5
-call :buildOnly %1 %2 %3 %4 %5
+if not errorlevel 1 call :buildOnly %1 %2 %3 %4 %5
 %FUNCTION_END% cmake:build %1 %2 %3 %4 %5
 goto :eof
 
@@ -101,7 +101,7 @@ goto :eof
 :install
 %FUNCTION_START% cmake:install %1 %2 %3 %4 %5
 call :build  %1 %2 %3 %4 %5
-call :installOnly %1 %2 %3 %4 %5
+if not errorlevel 1 call :installOnly %1 %2 %3 %4 %5
 %FUNCTION_END% cmake:install %1 %2 %3 %4 %5
 goto :eof
 

@@ -2,11 +2,18 @@
 pushd utils
 call init_log.bat
 call cmake.bat install cmake "" "" vs
+if errorlevel 1 (
+    echo. Fatal error building CMake
+    pause
+    exit /B %errorlevel%
+)
 call get_extern.bat
 REM To fix
 REM call :checkClang
 call build_extern.bat
 popd
+echo. Build finished
+pause
 goto :eof
 
 :checkClang
