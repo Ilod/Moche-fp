@@ -13,3 +13,6 @@
 [submodule "submodules/clang-tools-extra"]
 	path = submodules/clang-tools-extra
 	url = http://llvm.org/git/clang-tools-extra
+[submodule "submodules/premake5"]
+	path = submodules/premake5
+	url = https://github.com/annulen/premake.git

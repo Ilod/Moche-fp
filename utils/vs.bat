@@ -39,7 +39,7 @@ if %is64%==1 (
 ) else (
     set defaultPlatform=Win32
 )
-if "%~3"=="" (
+if "%~1"=="" (
     set buildPlatform=%defaultPlatform%
 ) else (
     set buildPlatform=%~1
@@ -69,6 +69,9 @@ if "%~1"=="visual" (
     set _ts=""
 )
 if "%~1"=="vs" (
+    set _ts=""
+)
+if "%~1"=="default" (
     set _ts=""
 )
 (

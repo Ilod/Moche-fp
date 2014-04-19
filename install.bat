@@ -3,6 +3,7 @@ pushd utils
 call init_log.bat
 call cmake.bat install cmake "" "" vs
 if errorlevel 1 (
+    popd
     echo. Fatal error building CMake
     pause
     exit /B %errorlevel%
@@ -12,6 +13,7 @@ REM To fix
 REM call :checkClang
 call build_extern.bat
 if errorlevel 1 (
+    popd
     echo. Fatal error building extern tools
     pause
     exit /B %errorlevel%

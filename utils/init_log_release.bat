@@ -1,5 +1,5 @@
 set TRACE=1^>nul
-set MSBUILDTRACE_EXTERN=/verbosity:quiet
+set MSBUILDTRACE_EXTERN=/clp:ErrorsOnly /verbosity:quiet
 set MSBUILDTRACE_INTERN=/clp:WarningsOnly
 set INTERNAL_CALL=REM
 set PRE_EXTERNAL_CALL=REM
