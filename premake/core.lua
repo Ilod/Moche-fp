@@ -221,6 +221,8 @@ parseProjectConfigValue = function(name, value, config)
         config.kind = value
     elseif name == "toolset" or name == "platformtoolset" then
         config.toolset = value
+    elseif name == "start" or name == "startup" or name == "startproject" or name == "startupproject" then
+        config.startproject = (value:lower() == "true")
     end
 end
 
@@ -409,6 +411,7 @@ initSolution = function(solutionName, solutionRootFolder, config)
     if config.name ~= nil then solutionName = config.name end
     solutionConfigCurrent = deepCopy(config)
     solution(solutionName)
+        solutionConfigCurrent.name = solutionName
         if os.is64bit() then
             platforms({ "x32", "x64" })
         else
@@ -475,6 +478,12 @@ initProject = function(config)
             askedKind = solutionConfigCurrent.defaultKind
         end
         kind(askedKind)
+        uuid(os.uuid("moche_premake_generation::" .. solutionConfigCurrent.name .. "::" .. config.name))
+        if config.startproject then
+            solution(solutionConfigCurrent.name)
+                startproject(config.name)
+            project(config.name)
+        end
         if config.toolset ~= nil then
             platformToolset(config.toolset)
         end
