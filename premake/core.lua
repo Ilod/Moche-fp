@@ -426,11 +426,14 @@ initSolution = function(solutionName, solutionRootFolder, config)
         language "C++"
         location("../build/%{sln.name}/" .. _ACTION .. "/")
         if solutionConfigCurrent.isTool then
+            solutionConfigCurrent.baseTargetDir = "../tools"
             targetdir("../tools/bin/%{sln.name}")
             location("../tools/build/%{sln.name}/" .. _ACTION .. "/")
         elseif solutionConfigCurrent.isLib then
+            solutionConfigCurrent.baseTargetDir = ".."
             targetdir("../lib/%{sln.name}")
         else
+            solutionConfigCurrent.baseTargetDir = ".."
             targetdir("../bin/%{sln.name}")
         end
         local askedKind = parseKindName(solutionConfigCurrent.defaultKind)
@@ -478,6 +481,11 @@ initProject = function(config)
             askedKind = solutionConfigCurrent.defaultKind
         end
         kind(askedKind)
+        if askedKind == "StaticLib" or askedKind == "SharedLib" then
+            targetdir(path.join(solutionConfigCurrent.baseTargetDir, "lib/%{sln.name}"))
+        else
+            targetdir(path.join(solutionConfigCurrent.baseTargetDir, "bin/%{sln.name}"))
+        end
         uuid(os.uuid("moche_premake_generation::" .. solutionConfigCurrent.name .. "::" .. config.name))
         if config.startproject then
             solution(solutionConfigCurrent.name)
