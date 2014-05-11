@@ -1,7 +1,24 @@
 local solutionConfigCurrent
 
+local configFileExtension       = ".mpc"
+
+local configFileGroupName       = "group"
+local configFileProjectName     = "project"
+local configFileSolutionName    = "solution"
+local configFileNoopName        = "noop"
+
+local configFileGroup           = configFileGroupName       .. configFileExtension
+local configFileProject         = configFileProjectName     .. configFileExtension
+local configFileSolution        = configFileSolutionName    .. configFileExtension
+local configFileNoop            = configFileNoopName        .. configFileExtension
+
+
 -- Log functions declarations
 local dump
+local log
+local setLogLevel
+local getLogLevel
+local LogLevel = { None = 0, Always = 1, Error = 2, Warning = 3, Debug = 4, Trace = 5, All = 6 }
 
 -- Variable type functions declarations
 local isObj
@@ -27,6 +44,8 @@ local isConfigFolder
 local exploreSrcFolder
 
 -- Public premake API extend functions declarations
+local pushGroup
+local popGroup
 local pushConfig
 local popConfig
 local addDefines
@@ -59,6 +78,22 @@ dump = function(var, indent)
         return ret .. indent .. "}"
     else
         return tostring(var)
+    end
+end
+
+local currentLogLevel = LogLevel.Always
+
+getLogLevel = function()
+    return currentLogLevel
+end
+
+setLogLevel = function(logLevel)
+    currentLogLevel = logLevel
+end
+
+log = function(logLevel, str, ...)
+    if logLevel <= currentLogLevel then
+        print(string.format(str, ...))
     end
 end
 
@@ -112,7 +147,7 @@ end
 
 -- Config file parsing function
 isConfigFolder = function(folder)
-    return os.isfile(path.join(folder, "project.mcp")) or os.isfile(path.join(folder, "group.mcp")) or os.isfile(path.join(folder, "noop.mcp")) or os.isfile(path.join(folder, "premake5.lua"))
+    return os.isfile(path.join(folder, configFileProject)) or os.isfile(path.join(folder, configFileGroup)) or os.isfile(path.join(folder, configFileNoop)) or os.isfile(path.join(folder, "premake5.lua"))
 end
 
 parseConfig = function(file, config, parseConfigValue)
@@ -190,14 +225,17 @@ parseProjectConfigValue = function(name, value, config)
 end
 
 parseSolution = function(solutionName, solutionRootFolder)
+    log(LogLevel.Debug, "Start parsing solution folder %s", solutionRootFolder)
     if os.isfile(path.join(solutionRootFolder, "premake5.lua")) then
+        log(LogLevel.Debug, "Premake5 file found")
         dofile(path.join(solutionRootFolder, "premake5.lua"))
     else
         local config = {}
         config.name = solutionName
         config.rootFolder = solutionRootFolder
-        if os.isfile(path.join(solutionRootFolder, "solution.mpc")) then
-            parseSolutionConfig(path.join(solutionRootFolder, "solution.mpc"), config)
+        if os.isfile(path.join(solutionRootFolder, configFileSolution)) then
+            log(LogLevel.Trace, "Solution config file found")
+            parseSolutionConfig(path.join(solutionRootFolder, configFileSolution), config)
         end
         initSolution(solutionName, solutionRootFolder, config)
         parseSolutionProjects()
@@ -205,23 +243,28 @@ parseSolution = function(solutionName, solutionRootFolder)
 end
 
 parseGroup = function(folder)
+    log(LogLevel.Debug, "Start parsing group folder %s", folder)
     local config = {}
     config.name = path.getname(folder)
-    if os.isfile(path.join(folder, "group.mpc")) then
-        parseGroupConfig(path.join(folder, "group.mpc"), config)
+    if os.isfile(path.join(folder, configFileGroup)) then
+        log(LogLevel.Trace, "Group config file found")
+        parseGroupConfig(path.join(folder, configFileGroup), config)
     end
     pushGroup(config.name)
 end
 
 parseProject = function(folder)
+    log(LogLevel.Debug, "Start parsing project folder %s", folder)
     if os.isfile(path.join(folder, "premake5.lua")) then
+        log(LogLevel.Debug, "Premake5 file found")
         dofile(path.join(folder, "premake5.lua"))
     else
         local config = {}
         config.name = path.getname(folder)
         config.rootFolder = folder
-        if os.isfile(path.join(folder, "project.mpc")) then
-            parseProjectConfig(path.join(folder, "project.mpc"), config)
+        if os.isfile(path.join(folder, configFileProject)) then
+            log(LogLevel.Trace, "Project config file found")
+            parseProjectConfig(path.join(folder, configFileProject), config)
         end
         initProject(config)
         exploreSrcFolder(config.rootFolder)
@@ -230,6 +273,7 @@ end
 
 parseSolutionProjects = function()
     if solutionConfigCurrent.noRootProject then
+        log(LogLevel.Trace, "No root project, explore subfolders")
         for i,dir in ipairs(os.matchdirs(solutionConfigCurrent.rootFolder .. "/*")) do
             parseFolder(dir)
         end
@@ -253,23 +297,29 @@ exploreSrcFolder = function(folder,configFolders)
 end
 
 parseFolder = function(folder)
+    log(LogLevel.Trace, "Parse folder %s", folder)
     if isConfigFolder(folder) then
-        if os.isfile(path.join(folder, "group.mcp")) then
+        if os.isfile(path.join(folder, configFileGroup)) then
+            log(LogLevel.Trace, "Group detected")
             parseGroup(folder)
         end
-        if os.isfile(path.join(folder, "project.mcp")) then
+        if os.isfile(path.join(folder, configFileProject)) then
+            log(LogLevel.Trace, "Project detected")
             parseProject(folder)
         elseif os.isfile(path.join(folder, "premake5.lua")) then
+            log(LogLevel.Trace, "Premake5 file detected")
             parseProject(folder)
-        elseif not os.isfile(path.join(folder, "noop.mcp")) then
+        elseif os.isfile(path.join(folder, configFileNoop)) then
+            log(LogLevel.Trace, "Noop detected")
             for i,dir in ipairs(os.matchdirs(folder .. "/*")) do
                 parseFolder(dir)
             end
         end
-        if os.isfile(path.join(folder, "group.mcp")) then
+        if os.isfile(path.join(folder, configFileGroup)) then
             popGroup()
         end
     else
+        log(LogLevel.Trace, "No config file, default to project")
         parseProject(folder)
     end
 end
@@ -291,6 +341,18 @@ parseKindName = function(kindName)
 end
 
 -- Public premake API extend functions
+
+local groupStack = {}
+
+pushGroup = function(groupName)
+    table.insert(groupStack, groupName)
+    group(table.concat(groupStack, "/"))
+end
+
+popGroup = function()
+    table.remove(groupStack)
+    group(table.concat(groupStack, "/"))
+end
 
 local configStack = {{}}
 
@@ -336,11 +398,11 @@ addFlags = function(_flags, platforms, configs)
 end
 
 addLibdirs = function(dirs)
-    libdirs(makePrefixedPathTable(dirs, '..'))
+    libdirs(makePrefixedPathTable(dirs, '.'))
 end
 
 addIncludedirs = function(dirs)
-    includedirs(makePrefixedPathTable(dirs, '..'))
+    includedirs(makePrefixedPathTable(dirs, '.'))
 end
 
 initSolution = function(solutionName, solutionRootFolder, config)
@@ -385,16 +447,17 @@ initSolution = function(solutionName, solutionRootFolder, config)
         end
             
         if solutionConfigCurrent.libdirs ~= nil then
-            addLibdirs(solutionConfigCurrent.libdirs)
+            addLibdirs(makePrefixedPathTable(solutionConfigCurrent.libdirs, solutionConfigCurrent.rootFolder))
         end
         if solutionConfigCurrent.incdirs ~= nil then
-            addIncludedirs(solutionConfigCurrent.incdirs)
+            addIncludedirs(makePrefixedPathTable(solutionConfigCurrent.incdirs, solutionConfigCurrent.rootFolder))
         end
         targetname "%{prj.name}_%{cfg.platform}_%{cfg.buildcfg}"
         warnings "Extra"
         addFlags { "FatalWarnings", "Unicode", "MultiProcessorCompile", "Symbols" }
         addDefines({"MOCHE_DEBUG", "DEBUG", "_DEBUG"}, nil, {"Debug"})
         addDefines({"MOCHE_RELEASE", "RELEASE", "_RELEASE"}, nil, {"Release"})
+        addDefines "_CRT_SECURE_NO_WARNINGS"
         pushConfig(nil, "Debug")
             optimize "Off"
         popConfig()
@@ -477,6 +540,40 @@ premake.override(premake.vstudio.vc2010, "platformToolset", function(orig, cfg)
     end
 end)
 
+newoption {
+    trigger = "log",
+    value = "Log level",
+    description = "The maximum log level to display",
+    allowed = {
+        { "none" },
+        { "always" },
+        { "error" },
+        { "warning" },
+        { "debug" },
+        { "trace" },
+        { "all" },
+    },
+}
+
+if (_OPTIONS["log"] ~= nil) then
+    local level = _OPTIONS["log"]:lower()
+    if level == "none" then
+        setLogLevel(LogLevel.None)
+    elseif level == "always" then
+        setLogLevel(LogLevel.Always)
+    elseif level == "error" then
+        setLogLevel(LogLevel.Error)
+    elseif level == "warning" then
+        setLogLevel(LogLevel.Warning)
+    elseif level == "debug" then
+        setLogLevel(LogLevel.Debug)
+    elseif level == "trace" then
+        setLogLevel(LogLevel.Trace)
+    elseif level == "all" then
+        setLogLevel(LogLevel.All)
+    end
+end
+
 premake.api.register {
     name = "platformToolset",
     scope = "config",
@@ -488,6 +585,9 @@ moche = {
         dump        = dump,
         isObject    = isObj,
         deepCopy    = deepCopy,
+        setLogLevel = setLogLevel,
+        getLogLevel = getLogLevel,
+        LogLevel    = LogLevel,
     },
     parse = {
         solution    = parseSolution,
@@ -496,6 +596,8 @@ moche = {
         projects    = parseSolutionProjects,
         src         = exploreSrcFolder,
     },
+    pushGroup       = pushGroup,
+    popGroup        = popGroup,
     pushConfig      = pushConfig,
     popConfig       = popConfig,
     defines         = addDefines,
