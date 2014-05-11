@@ -1,0 +1,4 @@
+name = Moche
+noRootProject = true
+toolset = llvm
+inc = ./
