@@ -32,9 +32,9 @@ call vs.bat getVisualYear YEAR_VISUAL
 %INTERNAL_CALL% vs.bat getPlatform "%~2" PLATFORM_FOLDER
 call vs.bat getPlatform "%~2" PLATFORM_FOLDER
 %INTERNAL_CALL% vs.bat getToolset "%~3" buildToolset
-call vs.bat getToolset "%~3" buildToolset
 REM Can't make cmake run with Clang, so default toolset for now
-set buildToolset=""
+REM call vs.bat getToolset "%~3" buildToolset
+call vs.bat getToolset vs buildToolset
 if "%PLATFORM_FOLDER%"=="x64" (
     set PLATFORM_SUFFIX=" Win64"
 ) else (
@@ -82,9 +82,9 @@ call vs.bat getVisualYear YEAR_VISUAL
 %INTERNAL_CALL% vs.bat getPlatform "%~3" PLATFORM_FOLDER
 call vs.bat getPlatform "%~3" PLATFORM_FOLDER
 %INTERNAL_CALL% vs.bat getToolset "%~4" buildToolset
-call vs.bat getToolset "%~4" buildToolset
 REM Can't make cmake run with Clang, so default toolset for now
-set buildToolset=""
+call vs.bat getToolset vs buildToolset
+REM call vs.bat getToolset "%~4" buildToolset
 if %buildToolset%=="" (
     set PLATFORM_FOLDER=%PLATFORM_FOLDER%
 ) else (
@@ -119,9 +119,9 @@ call vs.bat getVisualYear YEAR_VISUAL
 %INTERNAL_CALL% vs.bat getPlatform "%~3" PLATFORM_FOLDER
 call vs.bat getPlatform "%~3" PLATFORM_FOLDER
 %INTERNAL_CALL% vs.bat getToolset "%~4" buildToolset
-call vs.bat getToolset "%~4" buildToolset
 REM Can't make cmake run with Clang, so default toolset for now
-set buildToolset=""
+REM call vs.bat getToolset "%~4" buildToolset
+call vs.bat getToolset vs buildToolset
 if %buildToolset%=="" (
     set PLATFORM_FOLDER=%PLATFORM_FOLDER%
 ) else (

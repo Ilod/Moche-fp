@@ -19,6 +19,9 @@ if errorlevel 1 (
     exit /B %errorlevel%
 )
 echo. *** Install premake5 ***
+%PRE_EXTERNAL_CALL% mkdir "..\extern\bin\premake"
+%EXTERNAL_CALL% mkdir "..\extern\bin\premake"
+mkdir "..\extern\bin\premake" 1>nul 2>nul
 %PRE_EXTERNAL_CALL% copy /B /Y "..\submodules\premake5\bin\release\premake5.exe" ..\extern\bin\premake\premake5.exe
 %EXTERNAL_CALL% copy /B /Y "..\submodules\premake5\bin\release\premake5.exe" ..\extern\bin\premake\premake5.exe
 copy /B /Y "..\submodules\premake5\bin\release\premake5.exe" ..\extern\bin\premake\premake5.exe %TRACE%
