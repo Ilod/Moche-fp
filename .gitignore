@@ -1,3 +1,5 @@
 extern
 tools/build
 tools/bin
+bin
+build
