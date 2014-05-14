@@ -1,7 +1,7 @@
-extern
-tools/build
-tools/bin
-tools/lib
-bin
-build
-lib
+./extern
+./tools/build
+./tools/bin
+./tools/lib
+./bin
+./build
+./lib
