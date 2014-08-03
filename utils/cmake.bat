@@ -1,7 +1,7 @@
 %FILE_START% cmake
 setlocal
-set CMAKE=..\extern\bin\cmake\bin\cmake.exe
-if not exist %CMAKE% set CMAKE=..\bootstrap\cmake\bin\cmake.exe
+set CMAKE="%~dp0\..\extern\bin\cmake\bin\cmake.exe"
+if not exist %CMAKE% set CMAKE="%~dp0\..\bootstrap\cmake\bin\cmake.exe"
 REM repoName platform toolset displayName
 if %1==generate call :generate %2 %3 %4 %5
 REM repoName config platform toolset displayName
@@ -24,17 +24,17 @@ if "%~4" NEQ "" (
     echo. *** Generate %~1 solution ***
 )
 %INTERNAL_CALL% paths.bat getRepoPath %1 truePath
-call paths.bat getRepoPath %1 truePath
+call "%~dp0\paths.bat" getRepoPath %1 truePath
 %INTERNAL_CALL% vs.bat getVersionVisual VERSION_VISUAL
-call vs.bat getVersionVisual VERSION_VISUAL
+call "%~dp0\vs.bat" getVersionVisual VERSION_VISUAL
 %INTERNAL_CALL% vs.bat getVisualYear YEAR_VISUAL
-call vs.bat getVisualYear YEAR_VISUAL
+call "%~dp0\vs.bat" getVisualYear YEAR_VISUAL
 %INTERNAL_CALL% vs.bat getPlatform "%~2" PLATFORM_FOLDER
-call vs.bat getPlatform "%~2" PLATFORM_FOLDER
+call "%~dp0\vs.bat" getPlatform "%~2" PLATFORM_FOLDER
 %INTERNAL_CALL% vs.bat getToolset "%~3" buildToolset
 REM Can't make cmake run with Clang, so default toolset for now
-REM call vs.bat getToolset "%~3" buildToolset
-call vs.bat getToolset vs buildToolset
+REM call "%~dp0\vs.bat" getToolset "%~3" buildToolset
+call "%~dp0\vs.bat" getToolset vs buildToolset
 if "%PLATFORM_FOLDER%"=="x64" (
     set PLATFORM_SUFFIX=" Win64"
 ) else (
@@ -47,14 +47,13 @@ if %buildToolset%=="" (
     set TOOLSET=-T %buildToolset%
 )
 set PLATFORM_SUFFIX=%PLATFORM_SUFFIX:"=%
-set oldDir=%CD%
-%PRE_EXTERNAL_CALL% mkdir "..\extern\build\%~1\build\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%"
-%EXTERNAL_CALL% mkdir "..\extern\build\%~1\build\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%"
-mkdir "..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%" 1>nul 2>nul
-cd "..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%"
-%PRE_EXTERNAL_CALL% %oldDir%\%CMAKE% -G "Visual Studio %VERSION_VISUAL%%PLATFORM_SUFFIX%" -Wno-dev -DCMAKE_INSTALL_PREFIX="%oldDir%\..\extern\bin\%~1" %TOOLSET% "%oldDir%\%truePath%"
-%EXTERNAL_CALL% %oldDir%\%CMAKE% -G "Visual Studio %VERSION_VISUAL%%PLATFORM_SUFFIX%" -Wno-dev -DCMAKE_INSTALL_PREFIX="%oldDir%\..\extern\bin\%~1" %TOOLSET% "%oldDir%\%truePath%"
-%oldDir%\%CMAKE% -G "Visual Studio %VERSION_VISUAL%%PLATFORM_SUFFIX%" -Wno-dev -DCMAKE_INSTALL_PREFIX="%oldDir%\..\extern\bin\%~1" %TOOLSET% "%oldDir%\%truePath%" %TRACE%
+%PRE_EXTERNAL_CALL% mkdir "%~dp0\..\extern\build\%~1\build\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%"
+%EXTERNAL_CALL% mkdir "%~dp0\..\extern\build\%~1\build\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%"
+mkdir "%~dp0\..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%" 1>nul 2>nul
+cd "%~dp0\..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%"
+%PRE_EXTERNAL_CALL% %oldDir%\%CMAKE% -G "Visual Studio %VERSION_VISUAL%%PLATFORM_SUFFIX%" -Wno-dev -DCMAKE_INSTALL_PREFIX="%oldDir%\..\extern\bin\%~1" %TOOLSET% "%truePath%"
+%EXTERNAL_CALL% %oldDir%\%CMAKE% -G "Visual Studio %VERSION_VISUAL%%PLATFORM_SUFFIX%" -Wno-dev -DCMAKE_INSTALL_PREFIX="%oldDir%\..\extern\bin\%~1" %TOOLSET% "%truePath%"
+%CMAKE% -G "Visual Studio %VERSION_VISUAL%%PLATFORM_SUFFIX%" -Wno-dev -DCMAKE_INSTALL_PREFIX="%~dp0\..\extern\bin\%~1" %TOOLSET% "%truePath%" %TRACE%
 cd %oldDir%
 endlocal
 %FUNCTION_END% cmake:generate %1 %2 %3 %4
@@ -78,12 +77,12 @@ if "%~5" NEQ "" (
     echo. *** Build %~1 ***
 )
 %INTERNAL_CALL% vs.bat getVisualYear YEAR_VISUAL
-call vs.bat getVisualYear YEAR_VISUAL
+call "%~dp0\vs.bat" getVisualYear YEAR_VISUAL
 %INTERNAL_CALL% vs.bat getPlatform "%~3" PLATFORM_FOLDER
-call vs.bat getPlatform "%~3" PLATFORM_FOLDER
+call "%~dp0\vs.bat" getPlatform "%~3" PLATFORM_FOLDER
 %INTERNAL_CALL% vs.bat getToolset "%~4" buildToolset
 REM Can't make cmake run with Clang, so default toolset for now
-call vs.bat getToolset vs buildToolset
+call "%~dp0\vs.bat" getToolset vs buildToolset
 REM call vs.bat getToolset "%~4" buildToolset
 if %buildToolset%=="" (
     set PLATFORM_FOLDER=%PLATFORM_FOLDER%
@@ -91,9 +90,9 @@ if %buildToolset%=="" (
     set PLATFORM_FOLDER=%PLATFORM_FOLDER%_%buildToolset%
 )
 REM Can't make cmake run with Clang, so default toolset for now
-%INTERNAL_CALL% vs.bat build "..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\ALL_BUILD.vcxproj" %2 %3 vs
+%INTERNAL_CALL% vs.bat build "%~dp0\..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\ALL_BUILD.vcxproj" %2 %3 vs
 REM Can't make cmake run with Clang, so default toolset for now
-call vs.bat build "..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\ALL_BUILD.vcxproj" %2 %3 vs
+call "%~dp0\vs.bat" build "%~dp0\..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\ALL_BUILD.vcxproj" %2 %3 vs
 endlocal
 %FUNCTION_END% cmake:buildOnly %1 %2 %3 %4 %5
 goto :eof
@@ -115,21 +114,21 @@ if "%~5" NEQ "" (
 %PRE_EXTERNAL_CALL% rmdir /S /Q "..\extern\bin\%~1"
 %EXTERNAL_CALL% rmdir /S /Q "..\extern\bin\%~1"
 %INTERNAL_CALL% vs.bat getVisualYear YEAR_VISUAL
-call vs.bat getVisualYear YEAR_VISUAL
+call "%~dp0\vs.bat" getVisualYear YEAR_VISUAL
 %INTERNAL_CALL% vs.bat getPlatform "%~3" PLATFORM_FOLDER
-call vs.bat getPlatform "%~3" PLATFORM_FOLDER
+call "%~dp0\vs.bat" getPlatform "%~3" PLATFORM_FOLDER
 %INTERNAL_CALL% vs.bat getToolset "%~4" buildToolset
 REM Can't make cmake run with Clang, so default toolset for now
-REM call vs.bat getToolset "%~4" buildToolset
-call vs.bat getToolset vs buildToolset
+REM call "%~dp0\vs.bat" getToolset "%~4" buildToolset
+call "%~dp0\vs.bat" getToolset vs buildToolset
 if %buildToolset%=="" (
     set PLATFORM_FOLDER=%PLATFORM_FOLDER%
 ) else (
     set PLATFORM_FOLDER=%PLATFORM_FOLDER%_%buildToolset%
 )
 REM Can't make cmake run with Clang, so default toolset for now
-%INTERNAL_CALL% vs.bat build "..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\INSTALL.vcxproj" %2 %3 vs
+%INTERNAL_CALL% vs.bat build "%~dp0\..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\INSTALL.vcxproj" %2 %3 vs
 REM Can't make cmake run with Clang, so default toolset for now
-call vs.bat build "..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\INSTALL.vcxproj" %2 %3 vs
+call "%~dp0\vs.bat" build "%~dp0\..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\INSTALL.vcxproj" %2 %3 vs
 %FUNCTION_END% cmake:installOnly %1 %2 %3 %4 %5
 goto :eof

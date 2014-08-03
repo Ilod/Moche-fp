@@ -201,9 +201,9 @@ if %buildToolset%=="" (
     set buildToolsetArgument="/p:PlatformToolset=%buildToolset%"
 )
 call :setupEnv
-%PRE_EXTERNAL_CALL% msbuild "%~1" %buildToolsetArgument% /p:Configuration=%buildConfig% /p:Platform=%buildPlatform% /m %MSBUILDTRACE_EXTERN%
-%EXTERNAL_CALL% msbuild "%~1" %buildToolsetArgument% /p:Configuration=%buildConfig% /p:Platform=%buildPlatform% /m %MSBUILDTRACE_EXTERN%
-msbuild "%~1" %buildToolsetArgument% /p:Configuration=%buildConfig% /p:Platform=%buildPlatform% /m %MSBUILDTRACE_EXTERN%
+%PRE_EXTERNAL_CALL% msbuild "%~1" %buildToolsetArgument% /nologo /p:Configuration=%buildConfig% /p:Platform=%buildPlatform% %MSBUILDTRACE_EXTERN%
+%EXTERNAL_CALL% msbuild "%~1" %buildToolsetArgument% /nologo /p:Configuration=%buildConfig% /p:Platform=%buildPlatform% %MSBUILDTRACE_EXTERN%
+msbuild "%~1" %buildToolsetArgument% /nologo /p:Configuration=%buildConfig% /p:Platform=%buildPlatform% %MSBUILDTRACE_EXTERN%
 endlocal
 %FUNCTION_END% vs:build %1 %2 %3 %4
 goto :eof

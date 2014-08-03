@@ -1,19 +1,16 @@
 @echo off
-pushd utils
-call init_log.bat
-call cmake.bat install cmake "" "" vs
+call "%~dp0\utils\init_log.bat"
+call "%~dp0\utils\cmake.bat" install cmake "" "" vs
 if errorlevel 1 (
-    popd
     echo. Fatal error building CMake
     pause
     exit /B %errorlevel%
 )
-call get_extern.bat
+call "%~dp0\utils\get_extern.bat"
 REM To fix
 REM call :checkClang
-call build_extern.bat
+call "%~dp0\utils\build_extern.bat"
 if errorlevel 1 (
-    popd
     echo. Fatal error building extern tools
     pause
     exit /B %errorlevel%
@@ -25,9 +22,9 @@ goto :eof
 
 :checkClang
 echo. *** Search existing Clang Visual Studio integration ***
-call vs.bat getVisualVersion VERSION_VISUAL
-call vs.bat getVisualYear YEAR_VISUAL
-call vs.bat getPlatform "" PLATFORM
+call "%~dp0\utils\vs.bat" getVisualVersion VERSION_VISUAL
+call "%~dp0\utils\vs.bat" getVisualYear YEAR_VISUAL
+call "%~dp0\utils\vs.bat" getPlatform "" PLATFORM
 if "%VERSION_VISUAL%"=="12" set FOLDER_MSBUILD=\120
 if "%VERSION_VISUAL%"=="11" set FOLDER_MSBUILD=\110
 set FOUND=0
@@ -41,5 +38,5 @@ goto :eof
 
 :firstClang
 echo. *** Visual Studio Clang not found ***
-call cmake.bat install llvm "" "" "vs" "LLVM/CLang compiled by MSVC"
+call "%~dp0\utils\cmake.bat" install llvm "" "" "vs" "LLVM/CLang compiled by MSVC"
 goto :eof

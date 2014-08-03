@@ -1,1 +1,1 @@
-call init_log_release.bat
+call "%~dp0\init_log_release.bat"

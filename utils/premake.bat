@@ -1,7 +1,7 @@
 %FILE_START% premake
 setlocal
-set PREMAKE=..\extern\bin\premake\premake5.exe
-if not exist %PREMAKE% set PREMAKE=..\bootstrap\premake\premake5.exe
+set PREMAKE="%~dp0\..\extern\bin\premake\premake5.exe"
+if not exist %PREMAKE% set PREMAKE="%~dp0\..\bootstrap\premake\premake5.exe"
 REM repoName action displayName fullDisplayName additionalPremakeParameters
 if %~1==generate call :generate %2 %3 %4 %5 %6
 REM repoName config platform solutionName displayName
@@ -24,9 +24,9 @@ if "%~4" NEQ "" (
     )
 )
 %INTERNAL_CALL% paths.bat getRepoPath %1 truePath
-call paths.bat getRepoPath %1 truePath
+call "%~dp0\paths.bat" getRepoPath %1 truePath
 %INTERNAL_CALL% vs.bat getVisualYear YEAR_VISUAL
-call vs.bat getVisualYear YEAR_VISUAL
+call "%~dp0\vs.bat" getVisualYear YEAR_VISUAL
 set action=%~2
 if "%action%"=="" set action=vs
 if "%action%"=="visual" set action=vs
@@ -63,9 +63,9 @@ if "%~4" NEQ "" (
     set solutionName=%~1.sln
 )
 %INTERNAL_CALL% vs.bat getVisualYear YEAR_VISUAL
-call vs.bat getVisualYear YEAR_VISUAL
+call "%~dp0\vs.bat" getVisualYear YEAR_VISUAL
 %INTERNAL_CALL% vs.bat build "..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\%solutionName%" %2 %3 default
-call vs.bat build "..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\%solutionName%" %2 %3 default
+call "%~dp0\vs.bat" build "%~dp0\..\extern\build\%~1\vs%YEAR_VISUAL%\%PLATFORM_FOLDER%\%solutionName%" %2 %3 default
 endlocal
 %FUNCTION_END% premake:buildOnly %1 %2 %3 %4 %5
 goto :eof
